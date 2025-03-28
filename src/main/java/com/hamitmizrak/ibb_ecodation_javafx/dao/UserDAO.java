@@ -185,7 +185,7 @@ public class UserDAO implements IDaoImplements<UserDTO> {
     /// LOGIN (ILogin interface)
     @Override
     public Optional loginUser(String username, String password) {
-        String sql = "SELECT * FROM users WHERE username=?, AND password=?";
+        String sql = "SELECT * FROM users WHERE username=? AND password=?";
         return selectSingle(sql, username, password);
     }
 } //end class

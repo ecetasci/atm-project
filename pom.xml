@@ -34,16 +34,16 @@
 
     <properties>
         <encoding>UTF-8</encoding>
-        <java.version>17</java.version>
+        <java.version>11</java.version>
 
         <!--for maven-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!--Jenkins - SonarQube - Ve Maven İçin Gerekli-->
-        <maven.compiler.release>17</maven.compiler.release>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.release>11</maven.compiler.release>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
 
         <!--junit-->
         <junit.version>5.10.2</junit.version>

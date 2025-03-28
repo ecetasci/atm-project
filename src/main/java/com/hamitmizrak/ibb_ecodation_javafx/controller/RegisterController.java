@@ -93,13 +93,13 @@ public class RegisterController {
 
             // Eğer başarılıysa Pop-up göster
             showAlert("Başarılı", "Kayıt Başarılı", Alert.AlertType.INFORMATION);
-
+            userDAO.create(userDTO);//ece
             // Kayıt başarılı ise Admin Panelkine geçiş sağla
             switchToLoginPane();
 
         } else {
             // Eğer bilgiler yanlışsa, database kayıt olmamışsa
-            showAlert("Başarılı", "Giriş Başarılı", Alert.AlertType.ERROR);
+            showAlert("Başarısız", "Giriş Başarısız", Alert.AlertType.ERROR);
         }
     }
 

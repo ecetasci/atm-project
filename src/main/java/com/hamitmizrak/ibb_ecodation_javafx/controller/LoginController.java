@@ -83,13 +83,14 @@ public class LoginController {
 
             // Eğer başarılıysa Pop-up göster
             showAlert("Başarılı", "Giriş Başarılı", Alert.AlertType.INFORMATION);
+            userDAO.create(userDTO);//ece
 
             // Kayıt başarılı ise Admin Panelkine geçiş sağla
             openAdminPane();
 
         } else {
             // Eğer bilgiler yanlışsa, database kayıt olmamışsa
-            showAlert("Başarılı", "Giriş Başarılı", Alert.AlertType.ERROR);
+            showAlert("Başarısız", "Giriş Başarısız", Alert.AlertType.ERROR);
         }
     }
 

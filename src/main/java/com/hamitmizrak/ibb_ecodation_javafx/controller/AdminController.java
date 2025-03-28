@@ -19,11 +19,19 @@ import java.util.Optional;
 
 // Admin Controller
 public class AdminController {
+
+
     // Injection
     // Injection
     // Veri tabanı işlemleri için)
     private UserDAO userDAO;
+    public UserDAO getUserDAO() {
+        return userDAO;
+    }
 
+    public void setUserDAO(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
     // Parametresiz Constructor
     public AdminController() {
         userDAO = new UserDAO();
