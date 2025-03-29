@@ -32,18 +32,19 @@
     <!--<packaging>war</packaging>-->
     <packaging>jar</packaging>
 
+    <!--Dikkat: JavaFX JDK 17 istiyor 27-03-2025-->
     <properties>
         <encoding>UTF-8</encoding>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
 
         <!--for maven-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!--Jenkins - SonarQube - Ve Maven İçin Gerekli-->
-        <maven.compiler.release>11</maven.compiler.release>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
 
         <!--junit-->
         <junit.version>5.10.2</junit.version>
@@ -51,6 +52,27 @@
 
     <!-- start dependencies-->
     <dependencies>
+
+        <!--PDF-->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>2.0.29</version>
+        </dependency>
+
+        <!--EXCEL-->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.3</version>
+        </dependency>
+
+        <!-- Hashing Password-->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
 
         <!-- DATABASE -->
         <!-- RDBMS H2DB-->
@@ -181,7 +203,16 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- JavaFX base (StringBinding, ObjectProperty vs. için gerekli) -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>17.0.6</version>
+        </dependency>
+
     </dependencies>
+
 
     <!--build-start-->
     <build>
