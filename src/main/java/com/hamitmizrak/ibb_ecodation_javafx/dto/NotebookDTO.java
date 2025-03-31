@@ -20,6 +20,7 @@ public class NotebookDTO {
     private boolean pinned;  // Sabitlenmiş not mu?
     private UserDTO userDTO; //Composition
 
+
     // Constructorlar
     // Getter ve Setter'lar
 }

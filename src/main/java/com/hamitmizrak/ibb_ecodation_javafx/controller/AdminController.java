@@ -6,6 +6,7 @@ import com.hamitmizrak.ibb_ecodation_javafx.dto.KdvDTO;
 import com.hamitmizrak.ibb_ecodation_javafx.dto.UserDTO;
 import com.hamitmizrak.ibb_ecodation_javafx.utils.ERole;
 import com.hamitmizrak.ibb_ecodation_javafx.utils.FXMLPath;
+import com.microsoft.schemas.office.visio.x2012.main.ShapeSheetType;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -15,6 +16,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.print.Printer;
 import javafx.print.PrinterJob;
@@ -42,18 +44,19 @@ import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
-public class AdminController {
+public class AdminController implements Initializable {
 
+    @FXML
+    public MenuButton languageMenuButton;
     private UserDAO userDAO;
     private KdvDAO kdvDAO;
 
@@ -63,15 +66,23 @@ public class AdminController {
     }
 
     // User İçin
-    @FXML private TableView<UserDTO> userTable;
-    @FXML private TableColumn<UserDTO, Integer> idColumn;
-    @FXML private TableColumn<UserDTO, String> usernameColumn;
-    @FXML private TableColumn<UserDTO, String> emailColumn;
-    @FXML private TableColumn<UserDTO, String> passwordColumn;
-    @FXML private TableColumn<UserDTO, String> roleColumn;
+    @FXML
+    private TableView<UserDTO> userTable;
+    @FXML
+    private TableColumn<UserDTO, Integer> idColumn;
+    @FXML
+    private TableColumn<UserDTO, String> usernameColumn;
+    @FXML
+    private TableColumn<UserDTO, String> emailColumn;
+    @FXML
+    private TableColumn<UserDTO, String> passwordColumn;
+    @FXML
+    private TableColumn<UserDTO, String> roleColumn;
     //@FXML private ComboBox<String> roleComboBox; //// Sayfa açılır açılmaz geliyor
-    @FXML private TextField searchField;
-    @FXML private ComboBox<ERole> filterRoleComboBox;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private ComboBox<ERole> filterRoleComboBox;
 
     // KDV için
     @FXML
@@ -97,6 +108,13 @@ public class AdminController {
 
     @FXML
     private Label clockLabel;
+
+    @FXML
+    private Button btnKdvExportTxt, btnKdvExportPdf, btnKdvExportExcel, btnKdvPrint, btnKdvMail;
+
+
+    private Locale currentLocale = new Locale("tr");
+    private ResourceBundle bundle;
 
 
     @FXML
@@ -290,7 +308,8 @@ public class AdminController {
         ComboBox<String> kdvBox = new ComboBox<>();
         kdvBox.getItems().addAll("1%", "8%", "18%", "Özel");
         kdvBox.setValue("18%");
-        TextField customKdv = new TextField(); customKdv.setDisable(true);
+        TextField customKdv = new TextField();
+        customKdv.setDisable(true);
         TextField receiptField = new TextField();
         DatePicker datePicker = new DatePicker();
         Label resultLabel = new Label();
@@ -301,7 +320,8 @@ public class AdminController {
         });
 
         GridPane grid = new GridPane();
-        grid.setHgap(10); grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setVgap(10);
         grid.addRow(0, new Label("Tutar:"), amountField);
         grid.addRow(1, new Label("KDV Oranı:"), kdvBox);
         grid.addRow(2, new Label("Özel Oran:"), customKdv);
@@ -327,12 +347,12 @@ public class AdminController {
                     double total = amount + kdv;
 
                     String result = String.format("""
-                            Fiş No: %s
-                            Tarih: %s
-                            Ara Toplam: %.2f ₺
-                            KDV (%%%.1f): %.2f ₺
-                            Genel Toplam: %.2f ₺
-                            """,
+                                    Fiş No: %s
+                                    Tarih: %s
+                                    Ara Toplam: %.2f ₺
+                                    KDV (%%%.1f): %.2f ₺
+                                    Genel Toplam: %.2f ₺
+                                    """,
                             receiptField.getText(), datePicker.getValue(),
                             amount, rate, kdv, total);
 
@@ -591,7 +611,199 @@ public class AdminController {
     }
 
 
+    //Dil seçeneği
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        loadLanguage(currentLocale);
+    }
 
+    @FXML
+    private void languageTheme() {
+        currentLocale = currentLocale.getLanguage().equals("tr") ? new Locale("en") : new Locale("tr");
+        loadLanguage(currentLocale);
+    }
+
+
+    //Header FXML
+
+    @FXML
+    private Label headerLabel;
+    @FXML
+    private Button darkModeButton;
+    @FXML
+    private Button notificationButton;
+    @FXML
+    private Button backupButton;
+    @FXML
+    private Button restoreButton;
+    @FXML
+    private Button notebookButton;
+    @FXML
+    private Button profileButton;
+    @FXML
+    private Button logoutButton;
+
+//menü FXML
+
+    @FXML
+    private Menu menuFile;
+    @FXML
+    private MenuItem menuItemExit;
+
+    @FXML
+    private Menu menuUser;
+    @FXML
+    private MenuItem menuItemAddUser;
+    @FXML
+    private MenuItem menuItemUpdateUser;
+    @FXML
+    private MenuItem menuItemDeleteUser;
+
+    @FXML
+    private Menu menuKdv;
+    @FXML
+    private MenuItem menuItemAddKdv;
+    @FXML
+    private MenuItem menuItemUpdateKdv;
+    @FXML
+    private MenuItem menuItemDeleteKdv;
+
+    @FXML
+    private Menu menuOther;
+    @FXML
+    private MenuItem menuItemCalculator;
+    @FXML
+    private MenuItem menuItemNotebook;
+
+    @FXML
+    private Menu menuHelp;
+    @FXML
+    private MenuItem menuItemAbout;
+
+    @FXML
+    private Label userTitleLabel;
+    @FXML
+    private Button btnAddUser;
+    @FXML
+    private Button btnUpdateUser;
+    @FXML
+    private Button btnDeleteUser;
+    @FXML
+    private Button btnPrintUser;
+
+    @FXML
+    private Button btnAddKdv;
+    @FXML
+    private Button btnUpdateKdv;
+    @FXML
+    private Button btnDeleteKdv;
+
+    @FXML
+    private Label kdvTitleLabel;
+
+    @FXML
+    private Label footerLabel;
+
+
+    private void loadLanguage(Locale locale) {
+        bundle = ResourceBundle.getBundle("com.hamitmizrak.ibb_ecodation_javafx.messages", locale);
+
+        // Başlık ve üst bar
+
+        headerLabel.setText(bundle.getString("header.panel"));
+        darkModeButton.setText(bundle.getString("theme.dark"));
+        languageMenuButton.setText(bundle.getString("language")); // MenuButton için
+        notificationButton.setText(bundle.getString("notifications"));
+        backupButton.setText(bundle.getString("backup"));
+        restoreButton.setText(bundle.getString("restore"));
+        notebookButton.setText(bundle.getString("notebook"));
+        profileButton.setText(bundle.getString("profile"));
+        logoutButton.setText(bundle.getString("logout"));
+
+        // Menü başlıkları ve item'lar
+        menuFile.setText(bundle.getString("menu.file"));
+        menuItemExit.setText(bundle.getString("menu.exit"));
+
+        menuUser.setText(bundle.getString("menu.user"));
+        menuItemAddUser.setText(bundle.getString("menu.addUser"));
+        menuItemUpdateUser.setText(bundle.getString("menu.updateUser"));
+        menuItemDeleteUser.setText(bundle.getString("menu.deleteUser"));
+
+        menuKdv.setText(bundle.getString("menu.kdv"));
+        menuItemAddKdv.setText(bundle.getString("menu.addKdv"));
+        menuItemUpdateKdv.setText(bundle.getString("menu.updateKdv"));
+        menuItemDeleteKdv.setText(bundle.getString("menu.deleteKdv"));
+
+        menuOther.setText(bundle.getString("menu.other"));
+        menuItemCalculator.setText(bundle.getString("menu.calculator"));
+        menuItemNotebook.setText(bundle.getString("menu.notebook"));
+
+        menuHelp.setText(bundle.getString("menu.help"));
+        menuItemAbout.setText(bundle.getString("menu.about"));
+
+        // Kullanıcı yönetimi paneli
+
+        searchField.setPromptText(bundle.getString("user.searchPrompt"));
+        filterRoleComboBox.setPromptText(bundle.getString("user.rolePrompt"));
+
+
+        // KDV paneli
+        kdvTitleLabel.setText(bundle.getString("kdv.title"));
+
+
+        btnAddKdv.setText(bundle.getString("kdv.add"));
+        btnUpdateKdv.setText(bundle.getString("kdv.update"));
+        btnDeleteKdv.setText(bundle.getString("kdv.delete"));
+
+        searchKdvField.setPromptText(bundle.getString("kdv.searchPrompt"));
+
+        btnKdvExportTxt.setText(bundle.getString("kdv.exportTxt"));
+        btnKdvExportPdf.setText(bundle.getString("kdv.exportPdf"));
+        btnKdvExportExcel.setText(bundle.getString("kdv.exportExcel"));
+        btnKdvPrint.setText(bundle.getString("kdv.print"));
+        btnKdvMail.setText(bundle.getString("kdv.mail"));
+
+
+        userTitleLabel.setText(bundle.getString("user.title"));
+        searchField.setPromptText(bundle.getString("user.searchPrompt"));
+        filterRoleComboBox.setPromptText(bundle.getString("user.rolePrompt"));
+        btnAddUser.setText(bundle.getString("user.add"));
+        btnUpdateUser.setText(bundle.getString("user.update"));
+        btnDeleteUser.setText(bundle.getString("user.delete"));
+        btnPrintUser.setText(bundle.getString("user.print"));
+
+        // KDV tablosu başlıkları
+        idColumnKdv.setText(bundle.getString("kdv.id"));
+        amountColumn.setText(bundle.getString("kdv.amount"));
+        kdvRateColumn.setText(bundle.getString("kdv.rate"));
+        kdvAmountColumn.setText(bundle.getString("kdv.amountValue"));
+        totalAmountColumn.setText(bundle.getString("kdv.total"));
+        receiptColumn.setText(bundle.getString("kdv.receipt"));
+        dateColumn.setText(bundle.getString("kdv.date"));
+        descColumn.setText(bundle.getString("kdv.description"));
+
+// Kullanıcı tablosu başlıkları
+        idColumn.setText(bundle.getString("user.id"));
+        usernameColumn.setText(bundle.getString("user.username"));
+        emailColumn.setText(bundle.getString("user.email"));
+        passwordColumn.setText(bundle.getString("user.password"));
+        roleColumn.setText(bundle.getString("user.role"));
+
+        footerLabel.setText(bundle.getString("footer"));
+
+    }
+
+    @FXML
+    private void switchToTurkish() {
+        currentLocale = new Locale("tr");
+        loadLanguage(currentLocale);
+    }
+
+    @FXML
+    private void switchToEnglish() {
+        currentLocale = new Locale("en");
+        loadLanguage(currentLocale);
+    }
 
     /// //////////////////////////////////////////////////////////
     private static class AddUserDialog extends Dialog<UserDTO> {
@@ -676,7 +888,6 @@ public class AdminController {
             }
         });
     }
-
 
 
     @FXML
@@ -984,7 +1195,8 @@ public class AdminController {
         }
 
         GridPane grid = new GridPane();
-        grid.setHgap(10); grid.setVgap(10);
+        grid.setHgap(10);
+        grid.setVgap(10);
         grid.addRow(0, new Label("Tutar:"), amountField);
         grid.addRow(1, new Label("KDV Oranı (%):"), rateField);
         grid.addRow(2, new Label("Fiş No:"), receiptField);
@@ -1018,15 +1230,29 @@ public class AdminController {
     }
 
     // BİTİRME PROJESİ
-    @FXML
-    private void toggleTheme(ActionEvent event) {
-        // Tema değiştirme işlemleri burada yapılacak
-    }
+    //Dark Mode
+
+    private boolean isDarkMode = false; // Başlangıçta açık tema
 
     @FXML
-    private void languageTheme(ActionEvent event) {
-        // Uygulamanın dili değiştirilecek (TR/EN vs.)
+    private void toggleTheme() {
+        Scene scene = darkModeButton.getScene();
+        if (scene == null) return;
+
+        String darkTheme = getClass().getResource("/com/hamitmizrak/ibb_ecodation_javafx/css/dark-theme.css").toExternalForm();
+        String lightTheme = getClass().getResource("/com/hamitmizrak/ibb_ecodation_javafx/css/admin.css").toExternalForm();
+
+        if (isDarkMode) {
+            scene.getStylesheets().remove(darkTheme);
+            scene.getStylesheets().add(lightTheme);
+            isDarkMode = false;
+        } else {
+            scene.getStylesheets().remove(lightTheme);
+            scene.getStylesheets().add(darkTheme);
+            isDarkMode = true;
+        }
     }
+
 
     @FXML
     private void showNotifications(ActionEvent event) {
@@ -1035,7 +1261,7 @@ public class AdminController {
 
     @FXML
     private void showProfile(ActionEvent event) {
-        // Kullanıcı profil bilgileri gösterilecek pencere
+        // Kullanıcı profil bilgileri gösterilecek pencere //userdtoyla al
     }
 
     @FXML
