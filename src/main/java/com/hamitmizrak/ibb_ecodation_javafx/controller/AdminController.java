@@ -6,6 +6,7 @@ import com.hamitmizrak.ibb_ecodation_javafx.dto.KdvDTO;
 import com.hamitmizrak.ibb_ecodation_javafx.dto.UserDTO;
 import com.hamitmizrak.ibb_ecodation_javafx.utils.ERole;
 import com.hamitmizrak.ibb_ecodation_javafx.utils.FXMLPath;
+import com.hamitmizrak.ibb_ecodation_javafx.utils.SessionManager;
 import com.microsoft.schemas.office.visio.x2012.main.ShapeSheetType;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -1230,8 +1231,8 @@ public class AdminController implements Initializable {
     }
 
     // BİTİRME PROJESİ
-    //Dark Mode
 
+    //Dark Mode
     private boolean isDarkMode = false; // Başlangıçta açık tema
 
     @FXML
@@ -1259,10 +1260,44 @@ public class AdminController implements Initializable {
         // Bildirimleri gösteren popup veya panel açılacak
     }
 
-    @FXML
-    private void showProfile(ActionEvent event) {
-        // Kullanıcı profil bilgileri gösterilecek pencere //userdtoyla al
+
+    // Kullanıcı profil bilgileri gösterilecek pencere
+    private UserDTO currentUser;
+
+    public void setUser(UserDTO user) {
+        System.out.println("✅ AdminController#setUser: " + user);
+
+        this.currentUser = user;
     }
+
+
+    @FXML
+    private void showProfile() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/hamitmizrak/ibb_ecodation_javafx/view/profile.fxml"));
+            Parent root = loader.load();
+
+            ProfileController controller = loader.getController();
+            UserDTO currentUser = SessionManager.getCurrentUser();
+
+            // 🔥 Eğer currentUser null'sa patlamasın diye kontrol
+            if (currentUser != null) {
+                controller.setUser(currentUser);
+            } else {
+                System.err.println("currentUser null! setUser(...) çağrılmamış olabilir.");
+                return; // pencereyi bile açma
+            }
+
+            Stage stage = new Stage();
+            stage.setTitle("Profil");
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @FXML
     private void backupData(ActionEvent event) {
