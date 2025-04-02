@@ -3,8 +3,7 @@ package com.hamitmizrak.ibb_ecodation_javafx.dao;
 import com.hamitmizrak.ibb_ecodation_javafx.dto.Notification;
 import com.hamitmizrak.ibb_ecodation_javafx.enums.NotificationType;
 
-import java.io.FileWriter;
-import java.io.IOException;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

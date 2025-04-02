@@ -1,11 +1,15 @@
 package com.hamitmizrak.ibb_ecodation_javafx.dto;
 
 import com.hamitmizrak.ibb_ecodation_javafx.enums.NotificationType;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 public class Notification {
 
     private NotificationType notificationType;
@@ -14,29 +18,6 @@ public class Notification {
 
     private LocalDateTime timestamp;
 
-    public NotificationType getNotificationType() {
-        return notificationType;
-    }
-
-    public void setNotificationType(NotificationType notificationType) {
-        this.notificationType = notificationType;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
     public void saveToFile(String message) {
         try (FileWriter fw = new FileWriter("bildirimler.txt", true)) {
             fw.write(message + " - " + LocalDateTime.now() + System.lineSeparator());

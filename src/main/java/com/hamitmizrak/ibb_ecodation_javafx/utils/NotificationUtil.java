@@ -7,8 +7,6 @@ import javafx.scene.control.Alert;
 
 import java.util.List;
 
-import static com.hamitmizrak.ibb_ecodation_javafx.enums.NotificationType.*;
-
 public class NotificationUtil {
 
     private static final NotificationDAO notificationDAO;
