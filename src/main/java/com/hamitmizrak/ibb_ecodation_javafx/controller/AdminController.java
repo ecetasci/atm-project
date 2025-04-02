@@ -1,13 +1,14 @@
 package com.hamitmizrak.ibb_ecodation_javafx.controller;
 
 import com.hamitmizrak.ibb_ecodation_javafx.dao.KdvDAO;
+import com.hamitmizrak.ibb_ecodation_javafx.dao.NotebookDAO;
 import com.hamitmizrak.ibb_ecodation_javafx.dao.UserDAO;
 import com.hamitmizrak.ibb_ecodation_javafx.dto.KdvDTO;
+import com.hamitmizrak.ibb_ecodation_javafx.dto.NotebookDTO;
 import com.hamitmizrak.ibb_ecodation_javafx.dto.UserDTO;
 import com.hamitmizrak.ibb_ecodation_javafx.utils.ERole;
 import com.hamitmizrak.ibb_ecodation_javafx.utils.FXMLPath;
 import com.hamitmizrak.ibb_ecodation_javafx.utils.SessionManager;
-import com.microsoft.schemas.office.visio.x2012.main.ShapeSheetType;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -27,6 +28,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -58,6 +61,10 @@ public class AdminController implements Initializable {
 
     @FXML
     public MenuButton languageMenuButton;
+
+    // @FXML
+    //public VBox rootVBox;
+
     private UserDAO userDAO;
     private KdvDAO kdvDAO;
 
@@ -118,64 +125,6 @@ public class AdminController implements Initializable {
     private ResourceBundle bundle;
 
 
-    @FXML
-    public void initialize() {
-        // Zaman
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(1), e -> {
-                    LocalDateTime now = LocalDateTime.now();
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
-                    clockLabel.setText(now.format(formatter));
-                })
-        );
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
-
-        // KULLANICI
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
-        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-
-        // Rol filtreleme için ComboBox
-        filterRoleComboBox.getItems().add(null); // boş seçenek: tüm roller
-        filterRoleComboBox.getItems().addAll(ERole.values());
-        filterRoleComboBox.setValue(null); // başlangıçta tüm roller
-
-        // Arama kutusu dinleme
-        searchField.textProperty().addListener((observable, oldVal, newVal) -> applyFilters());
-        filterRoleComboBox.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
-
-        passwordColumn.setCellValueFactory(new PropertyValueFactory<>("password"));
-        passwordColumn.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(String password, boolean empty) {
-                super.updateItem(password, empty);
-                setText((empty || password == null) ? null : "******");
-            }
-        });
-
-        // Sayfa Açılır açılmaz geliyor
-        //roleComboBox.setItems(FXCollections.observableArrayList("USER", "ADMIN", "MODERATOR"));
-        //roleComboBox.getSelectionModel().select("USER");
-        refreshTable();
-
-        // KDV İÇİN
-        // KDV tablosunu hazırla
-        idColumnKdv.setCellValueFactory(new PropertyValueFactory<>("id"));
-        amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
-        kdvRateColumn.setCellValueFactory(new PropertyValueFactory<>("kdvRate"));
-        kdvAmountColumn.setCellValueFactory(new PropertyValueFactory<>("kdvAmount"));
-        totalAmountColumn.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
-        receiptColumn.setCellValueFactory(new PropertyValueFactory<>("receiptNumber"));
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("transactionDate"));
-        descColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
-
-        searchKdvField.textProperty().addListener((obs, oldVal, newVal) -> applyKdvFilter());
-
-        refreshKdvTable();
-    }
-
     // KULLANICI
     private void applyFilters() {
         String keyword = searchField.getText().toLowerCase().trim();
@@ -221,6 +170,68 @@ public class AdminController implements Initializable {
         }
     }
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        System.out.println("initialize çağrıldı!");
+        // Dil yükleme
+        loadLanguage(currentLocale);
+
+        // Zaman
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.seconds(1), e -> {
+                    LocalDateTime now = LocalDateTime.now();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+                    clockLabel.setText(now.format(formatter));
+                })
+        );
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+
+        // Not işlemleri
+        // initNote();
+
+        // VBox padding (FXML'deki root VBox için)
+        //rootVBox.setPadding(new Insets(15, 15, 15, 15));
+
+        // Kullanıcı tablosu
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
+
+        filterRoleComboBox.getItems().add(null);
+        filterRoleComboBox.getItems().addAll(ERole.values());
+        filterRoleComboBox.setValue(null);
+
+        searchField.textProperty().addListener((observable, oldVal, newVal) -> applyFilters());
+        filterRoleComboBox.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
+
+        passwordColumn.setCellValueFactory(new PropertyValueFactory<>("password"));
+        passwordColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String password, boolean empty) {
+                super.updateItem(password, empty);
+                setText((empty || password == null) ? null : "******");
+            }
+        });
+
+        refreshTable();
+
+        // KDV tablosu
+        idColumnKdv.setCellValueFactory(new PropertyValueFactory<>("id"));
+        amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        kdvRateColumn.setCellValueFactory(new PropertyValueFactory<>("kdvRate"));
+        kdvAmountColumn.setCellValueFactory(new PropertyValueFactory<>("kdvAmount"));
+        totalAmountColumn.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
+        receiptColumn.setCellValueFactory(new PropertyValueFactory<>("receiptNumber"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("transactionDate"));
+        descColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+
+        searchKdvField.textProperty().addListener((obs, oldVal, newVal) -> applyKdvFilter());
+
+        refreshKdvTable();
+    }
 
     @FXML
     private void refreshTable() {
@@ -613,10 +624,7 @@ public class AdminController implements Initializable {
 
 
     //Dil seçeneği
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        loadLanguage(currentLocale);
-    }
+
 
     @FXML
     private void languageTheme() {
@@ -1153,7 +1161,7 @@ public class AdminController implements Initializable {
         }
     }
 
-    // ❌ KDV sil
+    //
     @FXML
     public void deleteKdv() {
         KdvDTO selected = kdvTable.getSelectionModel().getSelectedItem();
@@ -1266,7 +1274,6 @@ public class AdminController implements Initializable {
 
     public void setUser(UserDTO user) {
         System.out.println("✅ AdminController#setUser: " + user);
-
         this.currentUser = user;
     }
 
@@ -1309,10 +1316,61 @@ public class AdminController implements Initializable {
         // Daha önce alınmış bir yedek dosyadan veri geri yüklenecek
     }
 
+    //Note
+    private NotebookDTO createdNote = new NotebookDTO();
+    private NotebookDTO notebookDTO = new NotebookDTO();
+    private NotebookDAO notebookDAO = new NotebookDAO();
 
     @FXML
     private void notebook(ActionEvent event) {
-        // Daha önce alınmış bir yedek dosyadan veri geri yüklenecek
+        try {
+            System.out.println(getClass().getResource("/noteForm.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/noteForm.fxml"));
+            Parent root = loader.load(); // ✅ BU SATIR ÇOK ÖNEMLİ!
+
+            // Controller erişimi
+            NoteController controller = loader.getController();
+
+            // currentUser kontrolü
+            UserDTO currentUser = SessionManager.getCurrentUser();
+            if (currentUser == null) {
+                System.err.println("currentUser null! setUser(...) çağrılmamış olabilir.");
+                return;
+            }
+
+            // user bilgilerini controller’a geçmek istersen:
+          //   controller.setUser(currentUser);  // varsa
+
+            Stage stage = new Stage();
+            stage.setTitle("Yeni Not Ekle");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root)); // ✅ SAHNE OLUŞTURULUYOR
+            stage.showAndWait();
+
+            NotebookDTO createdNote = controller.getCreatedNote();
+             controller.setCreatedNote(createdNote);
+
+            if (createdNote != null) {
+                System.out.println("Yeni not oluşturuldu:");
+                createdNote.setUserDTO(currentUser);
+                notebookDAO.save(createdNote);
+                notebookDAO.saveToFile(createdNote);
+
+                System.out.println(createdNote.toString());
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+
+    //public NotebookDTO getCreatedNote(NotebookDTO notebookDTO) {
+    // notebookDAO.getCreatedNote;
+//daodan listeyi çek stream ile listeye
+
+    //return createdNote;
+    //   }
+
 
 }

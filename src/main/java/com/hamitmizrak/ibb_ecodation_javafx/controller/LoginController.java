@@ -46,9 +46,7 @@ public class LoginController {
     public void login() {
         String username = usernameField.getText().trim();
         String password = passwordField.getText().trim();
-
         Optional<UserDTO> optionalLoginUserDTO = userDAO.loginUser(username, password);
-
         if (optionalLoginUserDTO.isPresent()) {
             UserDTO userDTO = optionalLoginUserDTO.get();
             showAlert("Başarılı", "Giriş Başarılı: " + userDTO.getUsername(), Alert.AlertType.INFORMATION);
@@ -57,8 +55,6 @@ public class LoginController {
             // profil detayları
             int requestedUserId = userDTO.getId();
             Optional<UserDTO> fullUserProfile = new UserDAO().findById(requestedUserId);
-
-
             fullUserProfile.ifPresent(SessionManager::setCurrentUser);
 
             // Yönlendirme
@@ -72,7 +68,6 @@ public class LoginController {
             showAlert("Başarısız", "Giriş bilgileri hatalı", Alert.AlertType.ERROR);
         }
     }
-
 
     private void openUserHomePane() {
         try {

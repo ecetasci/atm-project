@@ -1,0 +1,4 @@
+NotebookDTO{id=null, title='test', content='test', createdDate=2025-04-02T12:21:43.525380800, updatedDate=2025-04-02T12:21:43.525380800, pinned=false, userDTO=null}
+NotebookDTO{id=null, title='null', content='null', createdDate=null, updatedDate=null, pinned=false, userDTO=UserDTO(id=3, username=root, password=$2a$10$scHUXJ0OUwFsRYiH8OVah.hT8OD4R0R5/y6FvSyKUCEseqQwOlbQG, email=root, role=Yönetici)}
+NotebookDTO{id=null, title='test', content='test2', createdDate=2025-04-02T12:53:30.645558900, updatedDate=2025-04-02T12:53:30.645558900, pinned=false, userDTO=null}
+NotebookDTO{id=2, title='test3', content='test3', createdDate=2025-04-02T13:10:31.464192700, updatedDate=2025-04-02T13:10:31.464724100, pinned=false, userDTO=UserDTO(id=3, username=root, password=$2a$10$6C9yFF.e0koxC1Shq.i9LOkNAF6nIC/mL53CAzNmNR5MEyx/hlfN6, email=root, role=Yönetici)}

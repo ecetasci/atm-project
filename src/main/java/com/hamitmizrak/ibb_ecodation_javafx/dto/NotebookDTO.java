@@ -16,11 +16,22 @@ public class NotebookDTO {
     private String content;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
-    private String category; // Örn: "Kişisel", "İş", "Okul"
+    //private String category; // Örn: "Kişisel", "İş", "Okul"
     private boolean pinned;  // Sabitlenmiş not mu?
     private UserDTO userDTO; //Composition
 
-
-    // Constructorlar
+    @Override
+    public String toString() {
+        return "NotebookDTO{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", createdDate=" + createdDate +
+                ", updatedDate=" + updatedDate +
+                ", pinned=" + pinned +
+                ", userDTO=" + userDTO +
+                '}';
+    }
+// Constructorlar
     // Getter ve Setter'lar
 }
