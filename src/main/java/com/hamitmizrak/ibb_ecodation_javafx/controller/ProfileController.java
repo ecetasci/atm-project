@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class ProfileController {
 
-    private final UserDAO userDAO = new UserDAO(); // ✅ JavaFX uyumlu
+    private final UserDAO userDAO = new UserDAO();
 
     @FXML private Label username;
     @FXML private Label email;
@@ -18,7 +18,7 @@ public class ProfileController {
 
     public void setUser(UserDTO user) {
         // Veritabanından güncel halini alalım
-        System.out.println("👤 ProfileController#setUser gelen user: " + user);
+        System.out.println("ProfileController#setUser gelen user: " + user);
         Optional<UserDTO> dbUser = getUserProfile(user.getId());
 
         if (dbUser.isPresent()) {

@@ -6,8 +6,10 @@ import com.hamitmizrak.ibb_ecodation_javafx.dao.UserDAO;
 import com.hamitmizrak.ibb_ecodation_javafx.dto.KdvDTO;
 import com.hamitmizrak.ibb_ecodation_javafx.dto.NotebookDTO;
 import com.hamitmizrak.ibb_ecodation_javafx.dto.UserDTO;
+import com.hamitmizrak.ibb_ecodation_javafx.enums.NotificationType;
 import com.hamitmizrak.ibb_ecodation_javafx.utils.ERole;
 import com.hamitmizrak.ibb_ecodation_javafx.utils.FXMLPath;
+import com.hamitmizrak.ibb_ecodation_javafx.utils.NotificationUtil;
 import com.hamitmizrak.ibb_ecodation_javafx.utils.SessionManager;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -166,6 +168,7 @@ public class AdminController implements Initializable {
             stage.show();
         } catch (IOException e) {
             showAlert("Hata", "KDV ekranı açılamadı!", Alert.AlertType.ERROR);
+            NotificationUtil.showNotification("KDV ekranı açılamadı!", NotificationType.ERROR);
             e.printStackTrace();
         }
     }
@@ -173,7 +176,7 @@ public class AdminController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        System.out.println("initialize çağrıldı!");
+        System.out.println("Admincontroller initialize çağrıldı!");
         // Dil yükleme
         loadLanguage(currentLocale);
 
@@ -446,6 +449,7 @@ public class AdminController implements Initializable {
             showAlert("Başarılı", "TXT masaüstüne kaydedildi", Alert.AlertType.INFORMATION);
         } catch (IOException e) {
             showAlert("Hata", "TXT kaydedilemedi.", Alert.AlertType.ERROR);
+            NotificationUtil.showNotification("TXT kaydedilemedi.", NotificationType.ERROR);
         }
     }
 
@@ -471,6 +475,7 @@ public class AdminController implements Initializable {
             File file = new File(System.getProperty("user.home") + "/Desktop/kdv_" + System.currentTimeMillis() + ".pdf");
             doc.save(file);
             showAlert("Başarılı", "PDF masaüstüne kaydedildi", Alert.AlertType.INFORMATION);
+
         } catch (IOException e) {
             showAlert("Hata", "PDF kaydedilemedi.", Alert.AlertType.ERROR);
         }
@@ -522,6 +527,8 @@ public class AdminController implements Initializable {
             }
 
             showAlert("Başarılı", "Excel masaüstüne kaydedildi", Alert.AlertType.INFORMATION);
+
+            NotificationUtil.showNotification("Excel masaüstüne kaydedildi", NotificationType.SUCCESS);
         } catch (IOException e) {
             showAlert("Hata", "Excel kaydedilemedi.", Alert.AlertType.ERROR);
         }
@@ -1255,17 +1262,33 @@ public class AdminController implements Initializable {
             scene.getStylesheets().remove(darkTheme);
             scene.getStylesheets().add(lightTheme);
             isDarkMode = false;
+            NotificationUtil.showNotification("Tema değiştirildi", NotificationType.SUCCESS);
         } else {
             scene.getStylesheets().remove(lightTheme);
             scene.getStylesheets().add(darkTheme);
             isDarkMode = true;
+            NotificationUtil.showNotification("Tema değiştirildi", NotificationType.SUCCESS);
         }
     }
 
 
+
     @FXML
     private void showNotifications(ActionEvent event) {
-        // Bildirimleri gösteren popup veya panel açılacak
+        try {
+            System.out.println(getClass().getResource("/notification.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/notification.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("Bildirim Geçmişi");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -1274,6 +1297,7 @@ public class AdminController implements Initializable {
 
     public void setUser(UserDTO user) {
         System.out.println("✅ AdminController#setUser: " + user);
+
         this.currentUser = user;
     }
 
@@ -1317,8 +1341,8 @@ public class AdminController implements Initializable {
     }
 
     //Note
-    private NotebookDTO createdNote = new NotebookDTO();
-    private NotebookDTO notebookDTO = new NotebookDTO();
+   // private NotebookDTO createdNote = new NotebookDTO();
+    //private NotebookDTO notebookDTO = new NotebookDTO();
     private NotebookDAO notebookDAO = new NotebookDAO();
 
     @FXML
@@ -1326,7 +1350,7 @@ public class AdminController implements Initializable {
         try {
             System.out.println(getClass().getResource("/noteForm.fxml"));
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/noteForm.fxml"));
-            Parent root = loader.load(); // ✅ BU SATIR ÇOK ÖNEMLİ!
+            Parent root = loader.load();
 
             // Controller erişimi
             NoteController controller = loader.getController();
@@ -1352,6 +1376,7 @@ public class AdminController implements Initializable {
 
             if (createdNote != null) {
                 System.out.println("Yeni not oluşturuldu:");
+                NotificationUtil.showNotification("Yeni not oluşturuldu:", NotificationType.SUCCESS);
                 createdNote.setUserDTO(currentUser);
                 notebookDAO.save(createdNote);
                 notebookDAO.saveToFile(createdNote);
