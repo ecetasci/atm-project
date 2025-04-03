@@ -42,6 +42,8 @@ module com.hamitmizrak.ibb_ecodation_javafx {
     requires org.apache.pdfbox;
     requires java.desktop;
     requires java.mail;
+    requires com.google.gson;
+    //requires com.google.gson;
     //requires eu.hansolo.tilesfx;
 
     // #######################################################################################
@@ -51,7 +53,10 @@ module com.hamitmizrak.ibb_ecodation_javafx {
     opens com.hamitmizrak.ibb_ecodation_javafx to javafx.fxml;
 
     // DTO (Data Transfer Object) paketinin içeriği, JavaFX bileşenleri ve Lombok tarafından erişilebilir olmalıdır.
-    opens com.hamitmizrak.ibb_ecodation_javafx.dto to javafx.base, lombok;
+    opens com.hamitmizrak.ibb_ecodation_javafx.dto to javafx.base, com.google.gson;
+
+
+
 
     // Controller sınıfları FXML tarafından kullanılacağı için açılması gerekiyor.
     opens com.hamitmizrak.ibb_ecodation_javafx.controller to javafx.fxml;
@@ -61,6 +66,7 @@ module com.hamitmizrak.ibb_ecodation_javafx {
 
     // Veritabanı bağlantısı sağlayan sınıfların da SQL modülüne açık olması gerekiyor.
     opens com.hamitmizrak.ibb_ecodation_javafx.database to java.sql;
+
 
     // #####################################################################
     // Paket dışa aktarmak
@@ -74,7 +80,8 @@ module com.hamitmizrak.ibb_ecodation_javafx {
 
     // Ana paketi dış dünyaya açıyoruz. Diğer modüller bu paketin içeriğini kullanabilir.
     exports com.hamitmizrak.ibb_ecodation_javafx;
-    opens com.hamitmizrak.ibb_ecodation_javafx.utils to javafx.base, lombok;
+    opens com.hamitmizrak.ibb_ecodation_javafx.utils to javafx.base, lombok, com.google.gson;
+
 }
 
 //Default

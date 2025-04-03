@@ -10,3 +10,6 @@ Excel masaüstüne kaydedildi - 2025-04-02T19:21:32.830233600
 Şifre değişti - 2025-04-03T11:05:29.776018
 Şifre değişti - 2025-04-03T11:26:32.287595200
 Şifre değişti - 2025-04-03T11:37:04.775865600
+Yedeklenirken hata oluştu - 2025-04-03T16:50:23.410904500
+Yedekleme tamamlandı - 2025-04-03T17:02:22.938053600
+Yedekleme tamamlandı - 2025-04-03T22:34:53.883065900

@@ -1,5 +1,8 @@
 package com.hamitmizrak.ibb_ecodation_javafx.controller;
 
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.hamitmizrak.ibb_ecodation_javafx.dao.KdvDAO;
 import com.hamitmizrak.ibb_ecodation_javafx.dao.NotebookDAO;
 import com.hamitmizrak.ibb_ecodation_javafx.dao.UserDAO;
@@ -30,6 +33,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -47,8 +51,10 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -57,6 +63,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class AdminController implements Initializable {
 
@@ -1266,7 +1274,6 @@ public class AdminController implements Initializable {
     }
 
 
-
     @FXML
     private void showNotifications(ActionEvent event) {
         try {
@@ -1323,10 +1330,47 @@ public class AdminController implements Initializable {
         }
     }
 
-
     @FXML
     private void backupData(ActionEvent event) {
-        // Veritabanı yedekleme işlemleri burada yapılacak
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Yedekleme Dosyasını Kaydet");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ZIP Files", "*.zip"));
+        File saveLocation = fileChooser.showSaveDialog(backupButton.getScene().getWindow());
+
+        if (saveLocation != null) {
+            try (FileOutputStream fos = new FileOutputStream(saveLocation);
+                 ZipOutputStream zos = new ZipOutputStream(fos)) {
+
+                Optional<List<UserDTO>> allUsers = userDAO.list();
+
+                if (allUsers.isPresent()) {
+                    List<UserDTO> users = allUsers.get();
+
+                    Gson gson = new GsonBuilder()
+                            .excludeFieldsWithModifiers(Modifier.STATIC)
+                            .serializeNulls()
+                            .create();
+
+                    String json = gson.toJson(users);
+
+                    // 1. Zip içerisine bir dosya girişi ekleniyor
+                    ZipEntry zipEntry = new ZipEntry("backup.json");
+                    zos.putNextEntry(zipEntry);
+                    zos.write(json.getBytes());
+
+                    // 3. Giriş kapatılıyor
+                    zos.closeEntry();
+
+                    NotificationUtil.showNotification("Yedekleme tamamlandı", NotificationType.SUCCESS);
+                } else {
+                    System.out.println("Yedeklenecek kullanıcı verisi bulunamadı.");
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                NotificationUtil.showNotification("Yedekleme başarısız oldu", NotificationType.ERROR);
+            }
+        }
     }
 
     @FXML
@@ -1334,9 +1378,7 @@ public class AdminController implements Initializable {
         // Daha önce alınmış bir yedek dosyadan veri geri yüklenecek
     }
 
-    //Note
-   // private NotebookDTO createdNote = new NotebookDTO();
-    //private NotebookDTO notebookDTO = new NotebookDTO();
+    //Notebook
     private NotebookDAO notebookDAO = new NotebookDAO();
 
     @FXML
@@ -1356,9 +1398,6 @@ public class AdminController implements Initializable {
                 return;
             }
 
-            // user bilgilerini controller’a geçmek istersen:
-          //   controller.setUser(currentUser);  // varsa
-
             Stage stage = new Stage();
             stage.setTitle("Yeni Not Ekle");
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -1366,7 +1405,7 @@ public class AdminController implements Initializable {
             stage.showAndWait();
 
             NotebookDTO createdNote = controller.getCreatedNote();
-             controller.setCreatedNote(createdNote);
+            controller.setCreatedNote(createdNote);
 
             if (createdNote != null) {
                 System.out.println("Yeni not oluşturuldu:");
@@ -1374,7 +1413,6 @@ public class AdminController implements Initializable {
                 createdNote.setUserDTO(currentUser);
                 notebookDAO.save(createdNote);
                 notebookDAO.saveToFile(createdNote);
-
                 System.out.println(createdNote.toString());
             }
 
