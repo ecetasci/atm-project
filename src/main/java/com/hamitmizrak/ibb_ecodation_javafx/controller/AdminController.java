@@ -190,11 +190,6 @@ public class AdminController implements Initializable {
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
 
-        // Not işlemleri
-        // initNote();
-
-        // VBox padding (FXML'deki root VBox için)
-        //rootVBox.setPadding(new Insets(15, 15, 15, 15));
 
         // Kullanıcı tablosu
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));

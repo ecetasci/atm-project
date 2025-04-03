@@ -50,6 +50,9 @@ public class LoginController {
         if (optionalLoginUserDTO.isPresent()) {
             UserDTO userDTO = optionalLoginUserDTO.get();
             showAlert("Başarılı", "Giriş Başarılı: " + userDTO.getUsername(), Alert.AlertType.INFORMATION);
+            System.out.println("Login olan kullanıcı: " + userDTO.getUsername());
+            System.out.println("Veritabanındaki hash şifre: " + userDTO.getPassword());
+
             SessionManager.setCurrentUser(userDTO);
 
             // profil detayları
@@ -60,6 +63,7 @@ public class LoginController {
             // Yönlendirme
             if (userDTO.getRole() == ERole.ADMIN) {
                 openAdminPane(userDTO);
+
             } else {
                 openUserHomePane();
             }

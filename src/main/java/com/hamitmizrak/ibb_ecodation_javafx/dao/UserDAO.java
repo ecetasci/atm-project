@@ -159,7 +159,10 @@ public class UserDAO implements IDaoImplements<UserDTO>, ILogin<UserDTO> {
 
         if (userOpt.isPresent()) {
             UserDTO user = userOpt.get();
+
+
             if (BCrypt.checkpw(password, user.getPassword())) {
+                System.out.println("Karşılaştırma sonucu: " + BCrypt.checkpw(password, user.getPassword()));
                 return Optional.of(user);
             }
         }
@@ -187,6 +190,29 @@ public class UserDAO implements IDaoImplements<UserDTO>, ILogin<UserDTO> {
         } catch (SQLException e) {
             e.printStackTrace();
             return true; // hata varsa true dön ki işlem durdurulsun
+        }
+    }
+
+
+    public void updatePassword(UserDTO currentUser) {
+        System.out.println(currentUser.getPassword());
+        String sql = "UPDATE usertable SET password = ? WHERE username = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, currentUser.getPassword()); // Zaten hashli gelmeli
+            ps.setString(2, currentUser.getUsername());
+
+            System.out.println("AutoCommit: " + connection.getAutoCommit());
+
+            int rowsUpdated = ps.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Şifre veritabanında güncellendi. (id=" + currentUser.getId() + ")");
+            } else {
+                System.err.println("Şifre güncellenemedi! Kullanıcı bulunamadı.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Şifre güncellenirken hata oluştu!");
+            e.printStackTrace();
         }
     }
 
