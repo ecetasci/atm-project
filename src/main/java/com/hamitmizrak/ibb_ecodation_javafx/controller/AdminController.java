@@ -1,11 +1,10 @@
 package com.hamitmizrak.ibb_ecodation_javafx.controller;
 
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.hamitmizrak.ibb_ecodation_javafx.dao.KdvDAO;
 import com.hamitmizrak.ibb_ecodation_javafx.dao.NotebookDAO;
 import com.hamitmizrak.ibb_ecodation_javafx.dao.UserDAO;
+import com.hamitmizrak.ibb_ecodation_javafx.database.SingletonPropertiesDBConnection;
 import com.hamitmizrak.ibb_ecodation_javafx.dto.KdvDTO;
 import com.hamitmizrak.ibb_ecodation_javafx.dto.NotebookDTO;
 import com.hamitmizrak.ibb_ecodation_javafx.dto.UserDTO;
@@ -46,6 +45,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.h2.util.json.JSONArray;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -59,6 +59,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -70,6 +74,8 @@ public class AdminController implements Initializable {
 
     @FXML
     public MenuButton languageMenuButton;
+    @FXML
+    public Button restoreDataButton;
 
     // @FXML
     //public VBox rootVBox;
@@ -1376,6 +1382,57 @@ public class AdminController implements Initializable {
     @FXML
     private void restoreData(ActionEvent event) {
         // Daha önce alınmış bir yedek dosyadan veri geri yüklenecek
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Yedek Dosyasını Seç");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Backup File", "*.json"));
+
+        java.io.File file = fileChooser.showOpenDialog(null);
+        if (file == null) {
+            return;
+        }
+
+        try {
+            String jsonContent = Files.readString(Path.of(file.getAbsolutePath()));
+            JsonArray jsonArray = JsonParser.parseString(jsonContent).getAsJsonArray();
+
+            Connection conn = SingletonPropertiesDBConnection.getInstance().getConnection();
+
+            Statement stmt = conn.createStatement();
+            stmt.execute("DELETE FROM users");
+
+            // Yeni kullanıcıları eklemek için INSERT sorgusu hazırlanır
+            String insertSQL = "INSERT INTO users (id, username, password, email) VALUES (?, ?, ?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(insertSQL);
+
+            for (JsonElement jsonElement : jsonArray){
+                JsonObject user = jsonElement.getAsJsonObject();
+
+                int id = user.get("id").getAsInt();
+                String username = user.get("username").getAsString();
+                String password = user.get("password").getAsString();
+                String email = user.get("email").getAsString();
+
+
+                // Verileri sırayla SQL'e yerleştir
+                pstmt.setInt(1, id);
+                pstmt.setString(2, username);
+                pstmt.setString(3, password);
+                pstmt.setString(4, email);
+
+
+                // Sorguyu çalıştır
+                pstmt.executeUpdate();
+            }
+            pstmt.close();
+            System.out.println("Kullanıcılar başarıyla yüklendi!");
+
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     //Notebook
@@ -1401,7 +1458,7 @@ public class AdminController implements Initializable {
             Stage stage = new Stage();
             stage.setTitle("Yeni Not Ekle");
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root)); // ✅ SAHNE OLUŞTURULUYOR
+            stage.setScene(new Scene(root));
             stage.showAndWait();
 
             NotebookDTO createdNote = controller.getCreatedNote();
